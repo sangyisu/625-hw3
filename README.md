@@ -6,7 +6,7 @@
  - logistic():logistic regression
  - miceanalyze(): help you analyze the mice results based on RE
 
-##Installation
+## Installation
 download the hw3 file in your path
 then install.packages("hw3")
 
@@ -33,7 +33,7 @@ then install.packages("hw3")
 
 
 - glm_regression() :for binomial distribution:
-- 
+  
 ![Screenshot 2023-11-14 225342](https://github.com/sangyisu/625-hw3/assets/117102360/c2b9aa03-0847-400a-8741-133389d19f18)
 
 - miceanalyze():

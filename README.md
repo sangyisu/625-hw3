@@ -24,6 +24,7 @@ then install.packages("hw3")
 
 ![Screenshot 2023-11-14 225410](https://github.com/sangyisu/625-hw3/assets/117102360/a809f70d-0f86-4ff1-9977-032bb78c56c6)
 
+
 - glm_regression() : for poisson distribution:
 
 

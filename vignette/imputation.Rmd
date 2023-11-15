@@ -1,0 +1,111 @@
+---
+title: "imputationtest"
+author: "Sangyi Su"
+date: "2023-11-15"
+output: html_document
+---
+# Because there is no function that automatically analyzes the results after the imputation, this function cannot be compared with each other, but can be compared with the results calculated by hand
+
+## example
+```{r}
+library(mice)
+library(hw3)
+```
+
+```{r}
+set.seed(42)
+
+# Number of rows and columns
+num_rows <- 1000
+num_cols <- 5
+
+# Generate random data frame with NAs
+
+
+random_df <- data.frame(
+  ID = 1:num_rows,
+  Var1 = sample(c(1:10, NA), num_rows, replace = TRUE),
+  Var2 = sample(c(10:20, NA), num_rows, replace = TRUE),
+  Var3 = sample(c(20:30, NA), num_rows, replace = TRUE),
+  Var4 = sample(c(30:40, NA), num_rows, replace = TRUE),
+  Var5 = sample(c(40:50, NA), num_rows, replace = TRUE),
+  Y = sample(c(1:50), num_rows, replace = TRUE)
+)
+
+```
+
+```{r}
+imputed.dat = mice::mice(random_df)
+imputed.data = mice::complete(imputed.dat,"all")
+formula = Y ~ Var1+Var2+Var3+Var4+Var5
+
+```
+
+```{r}
+results = miceanalyze(formula = formula,imputed.data = imputed.data, n = 6,mydata =random_df)
+```
+
+### calculation by hand
+```{r}
+## by hand
+# within variance
+# w
+data.1 = data.frame(imputed.data$`1`)
+data.2 = data.frame(imputed.data$`2`)
+data.3 = data.frame(imputed.data$`3`)
+data.4 = data.frame(imputed.data$`4`)
+data.5 = data.frame(imputed.data$`5`)
+
+m1 = summary(lm(formula,data.1))
+m2 = summary(lm(formula,data.2))
+m3 = summary(lm(formula,data.3))
+m4 = summary(lm(formula,data.4))
+m5 = summary(lm(formula,data.5))
+
+m = 5
+W =
+  1/5*(m1$coefficients[,2]^2+m2$coefficients[,2]^2+m3$coefficients[,2]^2+m4$coefficients[,2]^2+m5$coefficients[,2]^2)
+W
+w.bar = 1/m*sum(W)
+w.bar
+
+
+# by hand
+# theta.mean
+theta.mean <- 1/m*(m1$coefficients[,1]+m2$coefficients[,1]+m3$coefficients[,1]+m4$coefficients[,1]+m5$coefficients[,1])
+theta.mean
+theta.i = m1$coefficients[,1]+m2$coefficients[,1]+m3$coefficients[,1]+m4$coefficients[,1]+m5$coefficients[,1]
+B = 1/(m-1)*sum((theta.i-theta.mean)^2)
+theta.i
+B
+
+# T
+t = w.bar+(1+1/m)*B
+t
+vm = (m-1)*(1+w.bar/(1+(1/5)*B))^2
+vm
+
+# r and lambda, RE
+(r = (1+1/m)*B/w.bar)
+(lambda = (r+2/(vm+3))/(r+1))
+(RE = (1+lambda/m)^(-1))
+
+```
+
+```{r}
+all.equal(results$t,t,check.attributes = FALSE)
+all.equal(results$vm,vm,check.attributes = FALSE)
+all.equal(results$w.bar,w.bar,check.attributes = FALSE)
+all.equal(results$B,B,check.attributes = FALSE)
+all.equal(results$m,m,check.attributes = FALSE)
+all.equal(results$r,r,check.attributes = FALSE)
+all.equal(results$lambda,lambda,check.attributes = FALSE)
+all.equal(results$RE,RE,check.attributes = FALSE)
+```
+
+
+
+### RUNTIME
+```{R}
+system.time(miceanalyze(formula = formula,imputed.data = imputed.data, n = 6,mydata =random_df))
+```

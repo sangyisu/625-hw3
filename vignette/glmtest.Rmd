@@ -1,0 +1,95 @@
+---
+title: "glm_regression"
+author: "Sangyi Su"
+date: "2023-11-15"
+output: html_document
+---
+
+```{r}
+library(hw3)
+```
+
+#examples
+### poisson distribution
+```{r}
+#---poisson
+num_rows <- 100
+num_cols <- 5
+random_df1 <- data.frame(
+  ID = 1:num_rows,
+  Var1 = sample(c(1:10), num_rows, replace = TRUE),
+  Var2 = sample(c(10:20), num_rows, replace = TRUE),
+  Var3 = sample(c(20:30), num_rows, replace = TRUE),
+  Var4 = sample(c(30:40), num_rows, replace = TRUE),
+  Var5 = sample(c(40:50), num_rows, replace = TRUE),
+  Y = sample(c(1:50), num_rows, replace = TRUE)
+)
+```
+
+- correctness
+```{r}
+formula = Y ~ Var1+Var2+Var3+Var4+Var5
+
+myresults1 = glm_regression(formula,random_df1,family = "poisson")
+
+
+result1 = glm(formula,random_df1,family = poisson)
+sum = summary(result1)
+pred1 = predict(result1,random_df1[,-7])
+
+all.equal(as.numeric(myresults1$coefficients),as.numeric(result1$coefficients),check.attributes = FALSE)
+all.equal(as.numeric(myresults1$ite),as.numeric(result1$iter),check.attributes = FALSE)
+all.equal(round(myresults1$residual.std.error,4),round(summary(result1)$coefficients[,2],4),check.attributes = FALSE)
+all.equal(as.numeric(myresults1$fitted.values),as.numeric(pred1))
+
+
+```
+- efficiency
+```{r}
+(system.time(glm_regression(formula,random_df1,family = "poisson")))
+(system.time(glm(formula,random_df1,family = poisson)))
+```
+
+
+
+### binary/binomial
+```{r}
+num_rows <- 100
+num_cols <- 5
+random_df2 <- data.frame(
+  ID = 1:num_rows,
+  Var1 = sample(c(1:10), num_rows, replace = TRUE),
+  Var2 = sample(c(10:20), num_rows, replace = TRUE),
+  Var3 = sample(c(20:30), num_rows, replace = TRUE),
+  Var4 = sample(c(30:40), num_rows, replace = TRUE),
+  Var5 = sample(c(40:50), num_rows, replace = TRUE),
+  Y = sample(c(FALSE,TRUE), num_rows, replace = TRUE)
+)
+
+formula = Y ~ Var1+Var2+Var3+Var4+Var5
+```
+
+
+-correctness
+
+```{r}
+formula = Y ~ Var1+Var2+Var3+Var4+Var5
+
+myresults2 = glm_regression(formula,random_df2,family = "binomial")
+
+
+result2 = glm(formula,random_df2,family = binomial)
+sum2 = summary(result2)
+pred2 = predict(result2,random_df2[,-7])
+
+all.equal(as.numeric(myresults2$coefficients),as.numeric(result2$coefficients),check.attributes = FALSE)
+all.equal(as.numeric(myresults2$ite),as.numeric(result2$iter),check.attributes = FALSE)
+all.equal(round(myresults2$residual.std.error,4),round(summary(result2)$coefficients[,2],4),check.attributes = FALSE)
+all.equal(as.numeric(myresults2$fitted.values),as.numeric(pred2))
+
+```
+- efficiency (improve)
+```{r}
+(system.time(glm_regression(formula,random_df2,family = "binomial")))
+(system.time(glm(formula,random_df2,family = binomial)))
+```

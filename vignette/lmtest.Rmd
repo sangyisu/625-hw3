@@ -1,0 +1,48 @@
+---
+title: "lmtest"
+author: "Sangyi Su"
+date: "2023-11-15"
+output: html_document
+---
+#examples
+```{r}
+library(hw3)
+num_rows <- 10000
+num_cols <- 5
+test.data <- data.frame(
+  ID = 1:num_rows,
+  Var1 = sample(c(1:10), num_rows, replace = TRUE),
+  Var2 = sample(c(-10:20), num_rows, replace = TRUE),
+  Var3 = sample(c(20:30), num_rows, replace = TRUE),
+  Var4 = sample(c(-30:40), num_rows, replace = TRUE),
+  Var5 = sample(c(40:50), num_rows, replace = TRUE),
+  Y = sample(c(-100:100), num_rows, replace = TRUE)
+)
+formula = Y ~ Var1+Var2+Var3+Var4+Var5
+```
+
+
+###run function
+```{r}
+myresults = linear_regression(formula,test.data)
+model = lm(formula,data = test.data)
+lm.results = summary(model)
+fitted = predict(model,test.data[,-1])
+```
+
+### correctnees
+```{r}
+all.equal(as.matrix(myresults$Coefficients),as.matrix(lm.results$coefficients),check.attributes = FALSE)
+all.equal(as.numeric(myresults$fittedvalues),as.numeric(fitted))
+all.equal(as.numeric(myresults$residual),as.numeric(lm.results$residuals))
+all.equal(myresults$residual.std.error,lm.results$sigma)
+all.equal(myresults$R_squared,lm.results$r.squared)
+all.equal(myresults$Adjusted.R_squared,lm.results$adj.r.squared)
+
+```
+
+#efficiency
+```{r}
+system.time(linear_regression(formula,test.data))
+system.time(lm(formula,data = test.data))
+```

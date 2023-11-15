@@ -1,0 +1,50 @@
+---
+title: "logistic test"
+author: "Sangyi Su"
+date: "2023-11-15"
+output: html_document
+---
+
+```{r}
+library(hw3)
+```
+
+# the test dataset
+```{r}
+num_rows <- 100
+num_cols <- 5
+random_df2 <- data.frame(
+  ID = 1:num_rows,
+  Var1 = sample(c(1:10), num_rows, replace = TRUE),
+  Var2 = sample(c(10:20), num_rows, replace = TRUE),
+  Var3 = sample(c(20:30), num_rows, replace = TRUE),
+  Var4 = sample(c(30:40), num_rows, replace = TRUE),
+  Var5 = sample(c(40:50), num_rows, replace = TRUE),
+  Y = sample(c(FALSE,TRUE), num_rows, replace = TRUE)
+)
+
+formula = Y ~ Var1+Var2+Var3+Var4+Var5
+```
+
+# test the correctness
+```{r}
+result2 = glm(formula,data = random_df2,family = binomial)
+result2$coefficients
+result2$iter
+myresults = logistic(formula,random_df2)
+myresults$ite
+pred = predict(result2,random_df2[,-7])
+
+all.equal(as.numeric(myresults$coefficients),as.numeric(result2$coefficients),check.attributes = FALSE)
+all.equal(as.numeric(myresults$ite),as.numeric(result2$iter),check.attributes = FALSE)
+all.equal(round(myresults$residual.std.error,4),round(summary(result2)$coefficients[,2],4),check.attributes = FALSE)
+all.equal(as.numeric(myresults$fitted.values),as.numeric(pred))
+
+```
+
+# test the efficiency
+```{r}
+(myruntime <- system.time(logistic(formula,random_df2)))
+system.time(glm(formula,data = random_df2,family = binomial))
+ 
+```
